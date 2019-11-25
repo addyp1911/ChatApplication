@@ -1,0 +1,94 @@
+<!-- chat/templates/chat/index.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Rooms</title>
+    <form action="">
+   <div align="right"  class="navbar-right"> <a href="http://127.0.0.1:8000/logout"> logout</a></div>
+        <div align="left"> WELCOME BACK --{{ username }}</div>
+        </form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+
+{% block contents %}
+    <br><br>
+    Online User <br> <br>
+
+     {% for uname in userlist %}
+       <input id="{{ uname }}" type="button" class="{{ uname }}" value="{{ uname }}" ><br><br>
+         <script>
+      document.querySelector('#{{ uname }}').onclick = function (e) {
+                var uname=(document.querySelector('#{{ uname }}').className);
+                var roomname= (uname+ "{{ username }}");
+                var strroom = roomname.toString();
+                var z= strroom.split("").sort();
+                var dom='';
+                for (i=0;i<z.length;i++){
+                    dom=dom+z[i];
+                }
+                window.location.pathname = '/chat/' + dom + '/';
+            };
+         </script>
+
+     {% endfor %}
+
+<div align="center">
+    What chat room would you like to enter and have a group chat?<br/>
+    <input id="room-name-input" type="text" size="100" required/><br/>
+    <input id="room-name-submit" type="button" value="Enter"/></div>
+
+{% endblock %}
+    <script>
+            document.querySelector('#room-name-input').focus();
+            document.querySelector('#room-name-input').onkeyup = function (e) {
+                if (e.keyCode === 13) {  // enter, return
+                    document.querySelector('#room-name-submit').click();
+                }
+            };
+
+            document.querySelector('#room-name-submit').onclick = function (e) {
+                var roomName = document.querySelector('#room-name-input').value;
+                window.location.pathname = '/chat/' + roomName + '/';
+            };
+
+
+            var user ='{{ username }}';
+            var token="{{ token }}";
+            localStorage.setItem(user, '{{ token }}');
+            sessionStorage.setItem("token","{{ token }}");
+            sessionStorage.setItem("user",user);
+         var roomName = document.querySelector('#room-name-input').value;
+ {##}
+ {#if (token==null) {#}
+ {#    window.history.forward();#}
+ {##}
+ {#    function noBack() {#}
+ {#        window.history.forward();#}
+ {#    }}#}
+
+
+        if (sessionStorage.getItem("token")!=null) {
+            $.ajax({
+                url: 'http://127.0.0.1:8000/chat',
+                headers: {
+                    'token': sessionStorage.getItem("token"), 'Content-Type': 'application/json',
+                },
+                method: 'post',
+                dataType: 'json',
+                data: token,
+                success: function (data) {
+                    console.log('success:--> ' + data);
+                }
+            });
+        }
+        else{
+             window.location.pathname = '/session';
+        }
+
+
+    </script>
+</body>
+</html>
